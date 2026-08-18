@@ -1,0 +1,22 @@
+<idea-plugin>
+    <id>io.github.qandil11.composeguard.ide</id>
+    <name>ComposeGuard</name>
+    <vendor url="https://github.com/Qandil11/composeguard">Qandil Tariq</vendor>
+    <description><![CDATA[
+        Jetpack Compose performance and correctness inspections powered by ComposeGuard.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection
+            language="kotlin"
+            shortName="ComposeGuardCg001"
+            displayName="CG001: Missing stable key in lazy list"
+            groupName="ComposeGuard"
+            enabledByDefault="true"
+            level="WARNING"
+            implementationClass="io.github.composeguard.ide.Cg001MissingLazyListKeyInspection"/>
+    </extensions>
+</idea-plugin>

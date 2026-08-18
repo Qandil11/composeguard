@@ -8,6 +8,7 @@ plugins {
 dependencies {
     implementation(project(":composeguard-core"))
     implementation(project(":composeguard-rules"))
+    implementation(kotlin("stdlib"))
 
     testImplementation(kotlin("test"))
     testImplementation(gradleTestKit())
