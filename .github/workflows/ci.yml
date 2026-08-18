@@ -51,7 +51,7 @@ jobs:
           EOF
           cat > "$tmp/build.gradle.kts" <<EOF
           plugins {
-              id("io.github.composeguard") version "0.1.0"
+              id("io.github.qandil11.composeguard") version "0.1.0"
           }
 
           composeGuard {

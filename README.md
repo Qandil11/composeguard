@@ -19,7 +19,7 @@ After public plugin publication, installation will look like:
 
 ```kotlin
 plugins {
-    id("io.github.composeguard") version "0.1.0"
+    id("io.github.qandil11.composeguard") version "0.1.0"
 }
 
 composeGuard {
@@ -44,7 +44,7 @@ pluginManagement {
 ```kotlin
 // build.gradle.kts
 plugins {
-    id("io.github.composeguard")
+    id("io.github.qandil11.composeguard")
 }
 ```
 
@@ -174,7 +174,7 @@ pluginManagement {
 ```kotlin
 // build.gradle.kts
 plugins {
-    id("io.github.composeguard") version "0.1.0"
+    id("io.github.qandil11.composeguard") version "0.1.0"
 }
 ```
 

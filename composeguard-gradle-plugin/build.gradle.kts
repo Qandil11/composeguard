@@ -18,7 +18,7 @@ gradlePlugin {
     vcsUrl.set("https://github.com/Qandil11/composeguard")
     plugins {
         create("composeGuard") {
-            id = "io.github.composeguard"
+            id = "io.github.qandil11.composeguard"
             displayName = "ComposeGuard"
             description = "Static performance and correctness checks for Jetpack Compose."
             tags.set(listOf("android", "jetpack-compose", "kotlin", "static-analysis", "performance"))

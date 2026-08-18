@@ -13,7 +13,7 @@
 - Run `./gradlew clean test`.
 - Run `../gradlew -p sample composeGuard`.
 - Run `./gradlew publishAllPublicationsToLocalPluginRepositoryRepository`.
-- Verify a fresh independent project can resolve `id("io.github.composeguard") version "0.1.0"` from the local repository.
+- Verify a fresh independent project can resolve `id("io.github.qandil11.composeguard") version "0.1.0"` from the local repository.
 - Commit release changes.
 - Tag with `git tag -a v0.1.0 -m "ComposeGuard v0.1.0"`.
 - Push commits and tags.
@@ -24,7 +24,7 @@
 - Add plugin portal credentials outside the repository.
 - Confirm plugin metadata: ID, display name, description, website, VCS URL, license, developers, and SCM.
 - Run the appropriate Gradle Plugin Portal publish task from a clean checkout.
-- Verify the plugin page appears and installation instructions use `id("io.github.composeguard") version "0.1.0"`.
+- Verify the plugin page appears and installation instructions use `id("io.github.qandil11.composeguard") version "0.1.0"`.
 
 ## 4. Maven Central If Needed
 
@@ -47,7 +47,7 @@
 
 ```kotlin
 plugins {
-    id("io.github.composeguard") version "0.1.0"
+    id("io.github.qandil11.composeguard") version "0.1.0"
 }
 ```
 

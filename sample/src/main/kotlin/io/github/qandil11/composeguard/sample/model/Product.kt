@@ -1,4 +1,4 @@
-package io.github.composeguard.sample.model
+package io.github.qandil11.composeguard.sample.model
 
 data class Product(
     val id: String,

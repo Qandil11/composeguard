@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.composeguard")
+    id("io.github.qandil11.composeguard")
 }
 
 composeGuard {

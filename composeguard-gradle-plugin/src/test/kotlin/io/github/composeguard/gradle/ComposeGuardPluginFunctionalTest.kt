@@ -62,7 +62,7 @@ class ComposeGuardPluginFunctionalTest {
         val projectDir = fixture("composeguard-phase-two-")
         projectDir.writeBuildFile(
             """
-                plugins { id("io.github.composeguard") }
+                plugins { id("io.github.qandil11.composeguard") }
                 
                 composeGuard {
                     failOnHigh = false
@@ -141,7 +141,7 @@ class ComposeGuardPluginFunctionalTest {
         val projectDir = fixture("composeguard-exclusions-")
         projectDir.writeBuildFile(
             """
-                plugins { id("io.github.composeguard") }
+                plugins { id("io.github.qandil11.composeguard") }
                 
                 composeGuard {
                     excludes.add("generated")
@@ -175,7 +175,7 @@ class ComposeGuardPluginFunctionalTest {
         val projectDir = fixture("composeguard-medium-threshold-")
         projectDir.writeBuildFile(
             """
-                plugins { id("io.github.composeguard") }
+                plugins { id("io.github.qandil11.composeguard") }
                 
                 composeGuard {
                     failOnSeverity = "MEDIUM"
@@ -206,7 +206,7 @@ class ComposeGuardPluginFunctionalTest {
         val projectDir = fixture("composeguard-minimum-severity-")
         projectDir.writeBuildFile(
             """
-                plugins { id("io.github.composeguard") }
+                plugins { id("io.github.qandil11.composeguard") }
                 
                 composeGuard {
                     minimumSeverity = "HIGH"
@@ -241,7 +241,7 @@ class ComposeGuardPluginFunctionalTest {
         return projectDir
     }
 
-    private fun File.writeBuildFile(contents: String = """plugins { id("io.github.composeguard") }""") {
+    private fun File.writeBuildFile(contents: String = """plugins { id("io.github.qandil11.composeguard") }""") {
         resolve("build.gradle.kts").writeText(contents)
     }
 

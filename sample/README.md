@@ -4,7 +4,7 @@ This standalone sample applies ComposeGuard through the Gradle plugins DSL using
 
 ```kotlin
 plugins {
-    id("io.github.composeguard")
+    id("io.github.qandil11.composeguard")
 }
 ```
 
