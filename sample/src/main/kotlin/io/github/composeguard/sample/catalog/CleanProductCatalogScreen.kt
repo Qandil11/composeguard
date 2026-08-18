@@ -1,4 +1,4 @@
-package com.example.composeguard.catalog
+package io.github.composeguard.sample.catalog
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import com.example.composeguard.model.Product
+import io.github.composeguard.sample.model.Product
 
 @Composable
 fun CleanProductCatalogScreen(products: List<Product>) {

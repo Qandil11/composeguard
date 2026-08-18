@@ -1,4 +1,4 @@
-package com.example.composeguard.model
+package io.github.composeguard.sample.model
 
 data class Product(
     val id: String,

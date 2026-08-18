@@ -13,8 +13,8 @@ dependencies {
 }
 
 gradlePlugin {
-    website.set("https://github.com/composeguard/composeguard")
-    vcsUrl.set("https://github.com/composeguard/composeguard")
+    website.set("https://github.com/Qandil11/composeguard")
+    vcsUrl.set("https://github.com/Qandil11/composeguard")
     plugins {
         create("composeGuard") {
             id = "io.github.composeguard"
@@ -30,7 +30,7 @@ publishing {
         pom {
             name.set("ComposeGuard Gradle Plugin")
             description.set("Gradle plugin for static performance and correctness checks for Jetpack Compose.")
-            url.set("https://github.com/composeguard/composeguard")
+            url.set("https://github.com/Qandil11/composeguard")
             licenses {
                 license {
                     name.set("The Apache License, Version 2.0")
@@ -44,9 +44,9 @@ publishing {
                 }
             }
             scm {
-                connection.set("scm:git:https://github.com/composeguard/composeguard.git")
-                developerConnection.set("scm:git:ssh://git@github.com/composeguard/composeguard.git")
-                url.set("https://github.com/composeguard/composeguard")
+                connection.set("scm:git:https://github.com/Qandil11/composeguard.git")
+                developerConnection.set("scm:git:ssh://git@github.com/Qandil11/composeguard.git")
+                url.set("https://github.com/Qandil11/composeguard")
             }
         }
     }

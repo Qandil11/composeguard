@@ -1,5 +1,10 @@
 # ComposeGuard
 
+[![CI](https://github.com/Qandil11/composeguard/actions/workflows/ci.yml/badge.svg)](https://github.com/Qandil11/composeguard/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/Qandil11/composeguard)](LICENSE)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue)](CHANGELOG.md)
+
 Static performance and correctness checks for Jetpack Compose.
 
 ComposeGuard is a Gradle plugin that scans Kotlin source for common Jetpack Compose performance and state-management problems before code is merged. It is intentionally small for `v0.1.0`: four deterministic Kotlin PSI-based rules, console and JSON reports, source exclusions, and configurable build failure policy.
@@ -186,6 +191,10 @@ ComposeGuard `v0.1.0` prefers false negatives over noisy false positives.
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Support
+
+If ComposeGuard is useful in your project, you can support its continued development through GitHub Sponsors.
 
 ## Licence
 

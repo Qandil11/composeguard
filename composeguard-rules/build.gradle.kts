@@ -23,7 +23,7 @@ publishing {
             pom {
                 name.set("ComposeGuard Rules")
                 description.set("Kotlin PSI rules for ComposeGuard.")
-                url.set("https://github.com/composeguard/composeguard")
+                url.set("https://github.com/Qandil11/composeguard")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
@@ -37,9 +37,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:https://github.com/composeguard/composeguard.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/composeguard/composeguard.git")
-                    url.set("https://github.com/composeguard/composeguard")
+                    connection.set("scm:git:https://github.com/Qandil11/composeguard.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/Qandil11/composeguard.git")
+                    url.set("https://github.com/Qandil11/composeguard")
                 }
             }
         }
