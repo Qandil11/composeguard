@@ -1,7 +1,8 @@
+import org.gradle.plugin.compatibility.compatibility
+
 plugins {
     kotlin("jvm")
-    `java-gradle-plugin`
-    `maven-publish`
+    id("com.gradle.plugin-publish") version "2.1.1"
 }
 
 dependencies {
@@ -19,8 +20,14 @@ gradlePlugin {
         create("composeGuard") {
             id = "io.github.composeguard"
             displayName = "ComposeGuard"
-            description = "Static performance checks for Jetpack Compose."
+            description = "Static performance and correctness checks for Jetpack Compose."
+            tags.set(listOf("android", "jetpack-compose", "kotlin", "static-analysis", "performance"))
             implementationClass = "io.github.composeguard.gradle.ComposeGuardPlugin"
+            compatibility {
+                features {
+                    configurationCache = false
+                }
+            }
         }
     }
 }
