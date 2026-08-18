@@ -1,29 +1,42 @@
 package io.github.composeguard.ide
 
-import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiElementVisitor
-import io.github.composeguard.rules.Cg001LazyListKeyDetector
-import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtVisitorVoid
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor
+import io.github.composeguard.rules.ComposeGuardRuleTexts
+import org.jetbrains.kotlin.psi.KtCallExpression
 
-class Cg001MissingLazyListKeyInspection : LocalInspectionTool() {
-    override fun getShortName(): String = "ComposeGuardCg001"
+class Cg001MissingLazyListKeyInspection : ComposeGuardInspection(
+    shortName = "ComposeGuardCg001",
+    ruleText = ComposeGuardRuleTexts.cg001
+) {
+    override fun inspect(element: PsiElement, holder: ProblemsHolder) {
+        val call = element as? KtCallExpression ?: return
+        if (call.calleeName() !in lazyContainers) return
 
-    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
-        object : KtVisitorVoid() {
-            override fun visitKtFile(file: KtFile) {
-                Cg001LazyListKeyDetector.detect(file.text).forEach { finding ->
-                    holder.registerProblem(
-                        file,
-                        TextRange(finding.startOffset, finding.endOffset),
-                        "CG001: Missing stable key in lazy list\n\n" +
-                            "Detected: ${finding.detected}\n\n" +
-                            "Why this matters: Without stable keys, Compose may perform unnecessary recomposition when list items change position.\n\n" +
-                            "Suggested remediation: add a stable key, for example key = { it.id }."
-                    )
+        call.lambdaArguments.forEach { lambda ->
+            lambda.accept(object : PsiRecursiveElementWalkingVisitor() {
+                override fun visitElement(element: PsiElement) {
+                    if (element is KtCallExpression && element.calleeName() in lazyItemCalls && !element.hasKeyArgument()) {
+                        holder.registerComposeGuardProblem(element, element.detectedSnippet())
+                    }
+                    super.visitElement(element)
                 }
-            }
+            })
         }
+    }
+
+    private fun KtCallExpression.hasKeyArgument(): Boolean =
+        valueArguments.any { it.getArgumentName()?.asName?.identifier == "key" }
+
+    private fun KtCallExpression.detectedSnippet(): String {
+        val callee = calleeName() ?: "items"
+        val firstArgument = valueArguments.firstOrNull()?.text ?: "..."
+        return "$callee($firstArgument) { ... }"
+    }
+
+    private companion object {
+        val lazyContainers = setOf("LazyColumn", "LazyRow")
+        val lazyItemCalls = setOf("items", "itemsIndexed")
+    }
 }

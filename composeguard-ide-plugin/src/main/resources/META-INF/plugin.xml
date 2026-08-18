@@ -18,5 +18,29 @@
             enabledByDefault="true"
             level="WARNING"
             implementationClass="io.github.composeguard.ide.Cg001MissingLazyListKeyInspection"/>
+        <localInspection
+            language="kotlin"
+            shortName="ComposeGuardCg002"
+            displayName="CG002: Collection transformation during composition"
+            groupName="ComposeGuard"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            implementationClass="io.github.composeguard.ide.Cg002CollectionOperationInspection"/>
+        <localInspection
+            language="kotlin"
+            shortName="ComposeGuardCg003"
+            displayName="CG003: Mutable collection stored in Compose state"
+            groupName="ComposeGuard"
+            enabledByDefault="true"
+            level="WARNING"
+            implementationClass="io.github.composeguard.ide.Cg003MutableCollectionStateInspection"/>
+        <localInspection
+            language="kotlin"
+            shortName="ComposeGuardCg004"
+            displayName="CG004: State write during composition"
+            groupName="ComposeGuard"
+            enabledByDefault="true"
+            level="WARNING"
+            implementationClass="io.github.composeguard.ide.Cg004StateWriteInspection"/>
     </extensions>
 </idea-plugin>

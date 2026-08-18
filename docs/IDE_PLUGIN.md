@@ -15,7 +15,7 @@ composeguard-ide-plugin
 
 The existing Gradle plugin remains the command-line and CI integration. The IDE plugin depends on `composeguard-core` and `composeguard-rules`, but the core/rules modules do not depend on IntelliJ Platform APIs.
 
-CG001 is shared through `Cg001LazyListKeyDetector`, a source-level detector owned by `composeguard-rules`. The Gradle rule and IDE inspection both call this detector, so the IDE integration does not introduce a second independently evolving CG001 definition.
+Rule text and Gradle detector outputs live in `composeguard-rules`. CG001 is shared through a source-level detector because it is useful in both Gradle and IDE contexts. CG002-CG004 keep Kotlin PSI-based detectors for the Gradle path and matching IntelliJ PSI visitors in the IDE plugin, because compiler-embeddable PSI and IDE PSI use different IntelliJ classloader/package roots. This keeps the Gradle plugin stable while avoiding compiler-embeddable dependencies in the IDE plugin distribution.
 
 ## Supported IDE Versions
 
@@ -54,14 +54,53 @@ This launches a sandbox IntelliJ IDEA instance with ComposeGuard installed.
 | Rule | Status |
 | --- | --- |
 | CG001 Missing stable lazy-list keys | Supported |
-| CG002 Collection transformations during composition | Not exposed in IDE yet |
-| CG003 Mutable collections inside mutableStateOf | Not exposed in IDE yet |
-| CG004 State writes during composition | Not exposed in IDE yet |
+| CG002 Collection transformations during composition | Supported |
+| CG003 Mutable collections inside mutableStateOf | Supported |
+| CG004 State writes during composition | Supported |
+
+## Inspection Configuration
+
+ComposeGuard rules are registered as separate local Kotlin inspections under the `ComposeGuard` group.
+
+Open IntelliJ IDEA or Android Studio settings:
+
+```text
+Editor > Inspections > ComposeGuard
+```
+
+Each rule can be enabled, disabled, or assigned a severity independently through the standard inspection profile UI.
+
+## Suppression
+
+ComposeGuard inspections use stable rule IDs as alternative inspection IDs:
+
+```kotlin
+@Suppress("CG004")
+@Composable
+fun Counter() {
+    var count by remember { mutableStateOf(0) }
+    count++
+}
+```
+
+Standard IntelliJ/Kotlin inspection suppression is expected to work where the IDE supports local inspection suppression for Kotlin PSI elements.
+
+## Quick Fixes
+
+No automatic quick fixes are provided in Phase 2.
+
+This is deliberate:
+
+- CG001 key insertion requires a reliable item identity; guessing `id` would be noisy.
+- CG002 cannot safely move arbitrary composition work into `remember` without choosing keys and preserving semantics.
+- CG003 conversions to `mutableStateListOf()` can change the state type and mutation model.
+- CG004 state writes need human intent to choose an event handler or effect.
 
 ## Known Limitations
 
-- CG001 is the only IDE inspection in this phase.
 - No quick fixes are provided yet.
-- The inspection is source-pattern based and intentionally conservative.
+- The IDE inspections are intentionally conservative and may prefer false negatives over noisy false positives.
+- CG002-CG004 share rule text and behavior intent with Gradle rules, but use IntelliJ PSI visitors instead of the compiler-embeddable PSI detector classes to avoid IDE classloader conflicts.
+- Android Studio compatibility has been checked through IntelliJ Platform compatibility verification only; manual Android Studio editor testing is still required before Marketplace publication.
 - No licensing, subscriptions, account system, payment code, or telemetry is included.
 - Marketplace publication is not configured or performed for the IDE plugin.
