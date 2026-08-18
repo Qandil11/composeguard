@@ -18,7 +18,7 @@ class Cg003MutableCollectionStateRule : ComposeGuardRule {
 
         ktFile.accept(object : PsiRecursiveElementWalkingVisitor() {
             override fun visitElement(element: PsiElement) {
-                if (element is KtCallExpression && element.calleeExpression?.text == "mutableStateOf" && element.hasMutableCollectionValue()) {
+                if (element is KtCallExpression && element.calleeName() == "mutableStateOf" && element.hasMutableCollectionValue()) {
                     issues += Issue(
                         id = id,
                         severity = Severity.HIGH,
@@ -27,7 +27,8 @@ class Cg003MutableCollectionStateRule : ComposeGuardRule {
                         message = "Mutable collection stored in Compose state.",
                         why = "Mutating the collection itself may not trigger correct Compose observation and can make state stability harder to reason about.",
                         detected = element.text,
-                        suggestion = "Use immutable collections, SnapshotStateList when appropriate, or replace state values instead of mutating the underlying collection."
+                        suggestion = "Use immutable collections, SnapshotStateList when appropriate, or replace state values instead of mutating the underlying collection.",
+                        path = file.path
                     )
                 }
                 super.visitElement(element)

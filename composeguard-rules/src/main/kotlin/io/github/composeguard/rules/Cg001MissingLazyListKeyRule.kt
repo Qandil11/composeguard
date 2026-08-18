@@ -19,8 +19,8 @@ class Cg001MissingLazyListKeyRule : ComposeGuardRule {
 
         ktFile.accept(object : PsiRecursiveElementWalkingVisitor() {
             override fun visitElement(element: PsiElement) {
-                if (element is KtCallExpression && element.calleeExpression?.text in lazyContainers) {
-                    val container = element.calleeExpression?.text ?: "LazyColumn"
+                if (element is KtCallExpression && element.calleeName() in lazyContainers) {
+                    val container = element.calleeName() ?: "LazyColumn"
                     element.lambdaArguments.forEach { lambda ->
                         issues += findLazyItemCalls(lambda, file, lines, container)
                     }
@@ -41,7 +41,7 @@ class Cg001MissingLazyListKeyRule : ComposeGuardRule {
         val issues = mutableListOf<Issue>()
         lambda.accept(object : PsiRecursiveElementWalkingVisitor() {
             override fun visitElement(element: PsiElement) {
-                if (element is KtCallExpression && element.calleeExpression?.text in lazyItemCalls && !element.hasKeyArgument()) {
+                if (element is KtCallExpression && element.calleeName() in lazyItemCalls && !element.hasKeyArgument()) {
                     issues += Issue(
                         id = id,
                         severity = Severity.HIGH,
@@ -57,7 +57,8 @@ class Cg001MissingLazyListKeyRule : ComposeGuardRule {
                             ) { product ->
                                 ...
                             }
-                        """.trimIndent()
+                        """.trimIndent(),
+                        path = file.path
                     )
                 }
                 super.visitElement(element)
@@ -70,7 +71,7 @@ class Cg001MissingLazyListKeyRule : ComposeGuardRule {
         valueArguments.any { it.getArgumentName()?.asName?.identifier == "key" }
 
     private fun KtCallExpression.detectedSnippet(): String {
-        val callee = calleeExpression?.text ?: "items"
+        val callee = calleeName() ?: "items"
         val firstArgument = valueArguments.firstOrNull()?.text ?: "..."
         return "$callee($firstArgument) { ... }"
     }

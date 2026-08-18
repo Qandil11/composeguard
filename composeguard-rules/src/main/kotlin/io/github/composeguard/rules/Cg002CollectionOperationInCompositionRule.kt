@@ -33,7 +33,8 @@ class Cg002CollectionOperationInCompositionRule : ComposeGuardRule {
                                     message = "Collection transformation executes during composition.",
                                     why = "Repeated collection work in composition can add avoidable UI-thread cost during recomposition.",
                                     detected = expression.text,
-                                    suggestion = "Move the transformation outside composition, or cache UI-specific work with remember using appropriate keys."
+                                    suggestion = "Move the transformation outside composition, or cache UI-specific work with remember using appropriate keys.",
+                                    path = file.path
                                 )
                             }
                             super.visitElement(bodyElement)
@@ -48,6 +49,7 @@ class Cg002CollectionOperationInCompositionRule : ComposeGuardRule {
     }
 
     private fun KtProperty.isDirectCollectionTransformation(function: KtNamedFunction): Boolean {
+        if (parentOfType<KtNamedFunction>() != function) return false
         if (isInsideLambdaWithin(function)) return false
         val expression = initializer as? KtDotQualifiedExpression ?: return false
         return expression.selectorExpression

@@ -8,5 +8,6 @@ data class Issue(
     val message: String,
     val detected: String? = null,
     val suggestion: String? = null,
-    val why: String? = null
+    val why: String? = null,
+    val path: String = file
 )

@@ -60,10 +60,14 @@ class Cg004StateWriteDuringCompositionRule : ComposeGuardRule {
         function.bodyExpression?.accept(object : PsiRecursiveElementWalkingVisitor() {
             override fun visitElement(element: PsiElement) {
                 when {
-                    element is KtUnaryExpression && element.isDirectCompositionStateMutation(function, delegatedState) -> {
+                    element is KtUnaryExpression &&
+                        element.parentOfType<KtNamedFunction>() == function &&
+                        element.isDirectCompositionStateMutation(function, delegatedState) -> {
                         issues += element.toIssue(file, lines)
                     }
-                    element is KtBinaryExpression && element.isDirectCompositionStateMutation(function, delegatedState, stateHolders) -> {
+                    element is KtBinaryExpression &&
+                        element.parentOfType<KtNamedFunction>() == function &&
+                        element.isDirectCompositionStateMutation(function, delegatedState, stateHolders) -> {
                         issues += element.toIssue(file, lines)
                     }
                 }
@@ -110,7 +114,8 @@ class Cg004StateWriteDuringCompositionRule : ComposeGuardRule {
             message = "Compose state is written during composition.",
             why = "Writing state while composing can trigger backwards writes and unstable recomposition loops.",
             detected = text,
-            suggestion = "Move state writes into an event handler or an effect such as LaunchedEffect, SideEffect, or DisposableEffect."
+            suggestion = "Move state writes into an event handler or an effect such as LaunchedEffect, SideEffect, or DisposableEffect.",
+            path = file.path
         )
 
     private companion object {

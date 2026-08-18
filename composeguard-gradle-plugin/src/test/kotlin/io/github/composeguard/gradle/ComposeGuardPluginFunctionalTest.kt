@@ -46,6 +46,15 @@ class ComposeGuardPluginFunctionalTest {
         val report = projectDir.resolve("build/reports/composeguard/composeguard.txt").readText()
         assertContains(report, "CG001 HIGH")
         assertContains(report, "ProductList.kt:7")
+
+        val jsonReport = projectDir.resolve("build/reports/composeguard/composeguard.json").readText()
+        assertContains(jsonReport, "\"toolVersion\": \"0.1.0\"")
+        assertContains(jsonReport, "\"filesAnalyzed\": 1")
+        assertContains(jsonReport, "\"ruleId\": \"CG001\"")
+        assertContains(jsonReport, "\"severity\": \"HIGH\"")
+        assertContains(jsonReport, "\"path\":")
+        assertContains(jsonReport, "\"description\": \"Missing stable key in LazyColumn.\"")
+        assertContains(jsonReport, "\"shouldFail\": true")
     }
 
     @Test

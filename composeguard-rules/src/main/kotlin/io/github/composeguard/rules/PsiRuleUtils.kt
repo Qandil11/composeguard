@@ -2,6 +2,7 @@ package io.github.composeguard.rules
 
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
@@ -30,6 +31,14 @@ internal fun KtNamedFunction.isComposable(): Boolean =
         entry.shortName?.asString() == "Composable" || entry.text.contains("Composable")
     }
 
+internal fun KtCallExpression.calleeName(): String? {
+    val callee = calleeExpression
+    return when (callee) {
+        is KtDotQualifiedExpression -> callee.selectorExpression?.text
+        else -> callee?.text
+    }
+}
+
 internal fun PsiElement.isInsideLambdaWithin(function: KtNamedFunction): Boolean {
     var current = parent
     while (current != null && current != function) {
@@ -44,7 +53,7 @@ internal fun PsiElement.isInsideCallLambdaWithin(function: KtNamedFunction, call
     while (current != null && current != function) {
         if (current is KtFunctionLiteral) {
             val call = current.parentOfType<KtCallExpression>()
-            if (call?.calleeExpression?.text in callNames) return true
+            if (call?.calleeName() in callNames) return true
         }
         current = current.parent
     }

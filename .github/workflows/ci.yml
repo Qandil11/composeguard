@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test
+        run: ./gradlew test
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Verify standalone sample
+        run: ./gradlew -p sample composeGuard
+
+      - name: Publish to local plugin repository
+        run: ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
+
+      - name: Verify local plugin repository consumer
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          mkdir -p "$tmp/src/main/kotlin"
+          cat > "$tmp/settings.gradle.kts" <<EOF
+          pluginManagement {
+              repositories {
+                  maven("${GITHUB_WORKSPACE}/build/local-plugin-repository")
+                  gradlePluginPortal()
+                  mavenCentral()
+                  google()
+              }
+          }
+
+          rootProject.name = "composeguard-ci-consumer"
+          EOF
+          cat > "$tmp/build.gradle.kts" <<EOF
+          plugins {
+              id("io.github.composeguard") version "0.1.0"
+          }
+
+          composeGuard {
+              failOnHigh.set(false)
+          }
+          EOF
+          cat > "$tmp/src/main/kotlin/ProductList.kt" <<EOF
+          @Composable
+          fun ProductList(products: List<Product>) {
+              LazyColumn {
+                  items(products) { product ->
+                      Text(product.name)
+                  }
+              }
+          }
+          EOF
+          ./gradlew -p "$tmp" composeGuard

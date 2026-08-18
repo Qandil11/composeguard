@@ -1,73 +1,28 @@
 # ComposeGuard
 
-Static performance checks for Jetpack Compose.
+Static performance and correctness checks for Jetpack Compose.
 
-## Current scope
+ComposeGuard is a Gradle plugin that scans Kotlin source for common Jetpack Compose performance and state-management problems before code is merged. It is intentionally small for `v0.1.0`: four deterministic Kotlin PSI-based rules, console and JSON reports, source exclusions, and configurable build failure policy.
 
-Phase 1 implemented only **CG001: Missing Lazy List Keys** to prove the full chain before adding more rules.
+ComposeGuard does not depend on the Android runtime and does not use Android Lint or compiler-plugin infrastructure yet.
 
-Phase 2 adds:
+## Installation
 
-- **CG002: Collection transformation during composition** for direct composable-body property initializers such as `val sorted = products.sortedBy { ... }`.
-- **CG003: Mutable collection stored in Compose state** for `mutableStateOf(mutableListOf(...))`, `mutableStateOf(ArrayList(...))`, and similar mutable collection factories/types.
-- **CG004: State written during composition** for obvious body-level writes to state created by `remember { mutableStateOf(...) }`, while skipping writes inside lambdas/effects/event handlers.
+ComposeGuard is prepared for Gradle plugins DSL consumption, but it has not been published to the Gradle Plugin Portal yet. Until publication, use an included build or a local Maven repository.
 
-CG005 is intentionally not implemented yet.
-
-Verified chain:
-
-1. Compose/Kotlin source is read from Gradle source directories.
-2. The analyser parses Kotlin with Kotlin PSI from `kotlin-compiler-embeddable`.
-3. Rules CG001-CG004 run as independent Kotlin PSI-based checks.
-4. The `composeGuard` Gradle task prints and writes a report.
-5. Tests cover rule detection, negative cases, report output, and Gradle task build policy.
-
-## Architecture decision
-
-The MVP uses **Kotlin PSI directly** rather than Android Lint, Detekt, or KtLint.
-
-Why:
-
-- ComposeGuard should be a standalone developer tool, not an Android app or Android-runtime-dependent library.
-- Kotlin PSI gives direct access to Kotlin call expressions and named arguments, which is enough for a conservative first rule.
-- Detekt and KtLint are good future integration targets, but starting with their rule engines would make ComposeGuard inherit their lifecycle and plugin APIs before the core issue model is proven.
-- Android Lint is powerful for Android projects, but it is heavier and less aligned with the requested Gradle-plugin-plus-analysis-engine shape for this MVP.
-
-## Run
-
-```bash
-./gradlew test
-```
-
-The end-to-end Gradle plugin proof is in:
-
-```text
-composeguard-gradle-plugin/src/test/kotlin/io/github/composeguard/gradle/ComposeGuardPluginFunctionalTest.kt
-```
-
-## Configuration
+After public plugin publication, installation will look like:
 
 ```kotlin
+plugins {
+    id("io.github.composeguard") version "0.1.0"
+}
+
 composeGuard {
-    // Backward-compatible build policy switch. Set false to report without failing.
-    failOnHigh = true
-
-    // Build fails when failOnHigh is true and an issue is at or above this severity.
-    failOnSeverity = "HIGH"
-
-    // Issues below this severity are omitted from the report.
-    minimumSeverity = "LOW"
-
-    sourceDirs.set(listOf("src/main/kotlin"))
-    excludes.add("generated")
+    failOnHigh.set(true)
 }
 ```
 
-Severity values are `HIGH`, `MEDIUM`, and `LOW`.
-
-## Local Consumption
-
-For local development, an external project can consume ComposeGuard through the plugins DSL with an included build:
+For local development from a checked-out ComposeGuard repository:
 
 ```kotlin
 // settings.gradle.kts
@@ -88,35 +43,150 @@ plugins {
 }
 ```
 
-The `sample/` project uses this path.
+## Run
+
+```bash
+./gradlew composeGuard
+```
+
+Reports are written to:
+
+```text
+build/reports/composeguard/composeguard.txt
+build/reports/composeguard/composeguard.json
+```
+
+## Example Finding
+
+```text
+CG001 HIGH
+ProductList.kt:21
+
+Missing stable key in LazyColumn.
+
+Detected:
+items(products) { ... }
+
+Consider:
+items(
+    items = products,
+    key = { it.id }
+) { product ->
+    ...
+}
+```
+
+## Rules
+
+| Rule | Severity | Description |
+| --- | --- | --- |
+| CG001 | HIGH | Detects `LazyColumn`/`LazyRow` `items(...)` and `itemsIndexed(...)` calls without a stable `key` argument. |
+| CG002 | MEDIUM | Detects direct collection transformations in composable body property initializers, such as `val sorted = products.sortedBy { ... }`. |
+| CG003 | HIGH | Detects mutable collections stored inside `mutableStateOf(...)`. |
+| CG004 | HIGH | Detects obvious Compose state writes in the composable body, such as `count++` or `state.value = ...`. |
+
+## Minimal Configuration
+
+```kotlin
+composeGuard {
+    failOnHigh.set(true)
+}
+```
+
+## Configuration Reference
+
+```kotlin
+composeGuard {
+    // Backward-compatible switch. Set false to report without failing the build.
+    failOnHigh.set(true)
+
+    // Build fails when failOnHigh is true and an issue is at or above this severity.
+    failOnSeverity.set("HIGH")
+
+    // Issues below this severity are omitted from reports.
+    minimumSeverity.set("LOW")
+
+    // Source roots to scan.
+    sourceDirs.set(listOf("src/main/kotlin", "src/debug/kotlin"))
+
+    // Simple path-substring exclusions.
+    excludes.add("generated")
+}
+```
+
+Severity values are `HIGH`, `MEDIUM`, and `LOW`.
+
+## CI Example
+
+```yaml
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew test build
+      - run: ./gradlew -p sample composeGuard
+```
 
 ## Local Publishing
 
-Publish plugin artifacts and the Gradle plugin marker to a local test repository:
+Publish all local artifacts, including the Gradle plugin marker:
 
 ```bash
 ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
 ```
 
-The repository is written to:
+Artifacts are written to:
 
 ```text
 build/local-plugin-repository
 ```
 
-External projects can then use:
+A separate test project can then resolve:
 
 ```kotlin
+// settings.gradle.kts
 pluginManagement {
     repositories {
-        maven("path/to/composeguard/build/local-plugin-repository")
+        maven("/path/to/composeguard/build/local-plugin-repository")
         gradlePluginPortal()
     }
 }
 ```
 
 ```kotlin
+// build.gradle.kts
 plugins {
-    id("io.github.composeguard") version "0.1.0-SNAPSHOT"
+    id("io.github.composeguard") version "0.1.0"
 }
 ```
+
+## Limitations
+
+ComposeGuard `v0.1.0` prefers false negatives over noisy false positives.
+
+- Rules use Kotlin PSI syntax inspection only; no type resolution or dataflow analysis is performed.
+- CG002 only reports direct composable-body property initializers. It intentionally skips transformations inside lambdas such as `remember { ... }`.
+- CG004 only reports obvious writes to local state created with `remember { mutableStateOf(...) }`. It skips writes inside lambdas, effects, and event handlers.
+- Exclusions are simple normalized path-substring matches, not full glob patterns.
+- CG005 is not implemented yet.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Licence
+
+ComposeGuard is released under the Apache License 2.0. See [LICENSE](LICENSE).

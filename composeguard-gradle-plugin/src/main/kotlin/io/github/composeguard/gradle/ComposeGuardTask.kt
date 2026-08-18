@@ -2,6 +2,7 @@ package io.github.composeguard.gradle
 
 import io.github.composeguard.core.BuildPolicy
 import io.github.composeguard.core.ComposeGuardAnalyzer
+import io.github.composeguard.core.ComposeGuardJsonReport
 import io.github.composeguard.core.ComposeGuardReport
 import io.github.composeguard.core.Severity
 import io.github.composeguard.core.SeverityPolicy
@@ -31,11 +32,17 @@ abstract class ComposeGuardTask : DefaultTask() {
     @get:Input
     abstract val excludes: ListProperty<String>
 
+    @get:Input
+    abstract val toolVersion: Property<String>
+
     @get:InputFiles
     abstract val sourceDirectories: ListProperty<Directory>
 
     @get:OutputFile
     abstract val reportFile: RegularFileProperty
+
+    @get:OutputFile
+    abstract val jsonReportFile: RegularFileProperty
 
     @TaskAction
     fun run() {
@@ -73,8 +80,20 @@ abstract class ComposeGuardTask : DefaultTask() {
         output.parentFile.mkdirs()
         output.writeText(report)
 
+        val jsonOutput = jsonReportFile.get().asFile
+        jsonOutput.parentFile.mkdirs()
+        jsonOutput.writeText(
+            ComposeGuardJsonReport.render(
+                toolVersion = toolVersion.get(),
+                issues = issues,
+                filesAnalyzed = files.size,
+                buildPolicy = buildPolicy
+            )
+        )
+
         logger.lifecycle(report)
         logger.lifecycle("Report written to ${output.path}")
+        logger.lifecycle("JSON report written to ${jsonOutput.path}")
 
         if (buildPolicy.shouldFail) {
             throw GradleException("ComposeGuard found issues at or above ${buildPolicy.minimumFailureSeverity}.")

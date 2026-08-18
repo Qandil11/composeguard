@@ -1,5 +1,6 @@
 package io.github.composeguard.gradle
 
+import io.github.composeguard.core.ComposeGuardVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -19,6 +20,8 @@ class ComposeGuardPlugin : Plugin<Project> {
             it.minimumSeverity.set(extension.minimumSeverity)
             it.excludes.set(extension.excludes)
             it.reportFile.set(project.layout.buildDirectory.file("reports/composeguard/composeguard.txt"))
+            it.jsonReportFile.set(project.layout.buildDirectory.file("reports/composeguard/composeguard.json"))
+            it.toolVersion.set(ComposeGuardVersion.VERSION)
             it.sourceDirectories.set(extension.sourceDirs.map { dirs ->
                 dirs.map { dir -> project.layout.projectDirectory.dir(dir) }
             })
