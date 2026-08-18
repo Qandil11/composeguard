@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("..")
     repositories {
         gradlePluginPortal()
         mavenCentral()
@@ -9,13 +10,9 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        mavenCentral()
         google()
+        mavenCentral()
     }
 }
 
-rootProject.name = "ComposeGuard"
-
-include(":composeguard-core")
-include(":composeguard-rules")
-include(":composeguard-gradle-plugin")
+rootProject.name = "composeguard-sample"

@@ -4,13 +4,16 @@ object ComposeGuardReport {
     fun render(
         issues: List<Issue>,
         filesAnalyzed: Int = 0,
-        failOnHigh: Boolean = true,
+        buildPolicy: BuildPolicy = BuildPolicy(
+            enabled = true,
+            minimumFailureSeverity = Severity.HIGH,
+            shouldFail = issues.any { it.severity == Severity.HIGH }
+        ),
         score: Int = scoreFor(issues)
     ): String = buildString {
         val highCount = issues.count { it.severity == Severity.HIGH }
         val mediumCount = issues.count { it.severity == Severity.MEDIUM }
         val lowCount = issues.count { it.severity == Severity.LOW }
-        val buildFails = failOnHigh && highCount > 0
 
         appendLine("ComposeGuard Report")
         appendLine("===================")
@@ -18,7 +21,7 @@ object ComposeGuardReport {
         appendLine("Files analysed: $filesAnalyzed")
         appendLine("Total issues: ${issues.size}")
         appendLine("Score: $score/100")
-        appendLine("Build policy: ${if (buildFails) "FAIL" else "PASS"} (failOnHigh=$failOnHigh)")
+        appendLine("Build policy: ${buildPolicy.describe()}")
         appendLine()
 
         if (issues.isEmpty()) {

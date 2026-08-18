@@ -15,6 +15,9 @@ class ComposeGuardPlugin : Plugin<Project> {
             it.group = "verification"
             it.description = "Runs ComposeGuard static performance checks."
             it.failOnHigh.set(extension.failOnHigh)
+            it.failOnSeverity.set(extension.failOnSeverity)
+            it.minimumSeverity.set(extension.minimumSeverity)
+            it.excludes.set(extension.excludes)
             it.reportFile.set(project.layout.buildDirectory.file("reports/composeguard/composeguard.txt"))
             it.sourceDirectories.set(extension.sourceDirs.map { dirs ->
                 dirs.map { dir -> project.layout.projectDirectory.dir(dir) }

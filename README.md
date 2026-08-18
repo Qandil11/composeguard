@@ -44,3 +44,79 @@ The end-to-end Gradle plugin proof is in:
 ```text
 composeguard-gradle-plugin/src/test/kotlin/io/github/composeguard/gradle/ComposeGuardPluginFunctionalTest.kt
 ```
+
+## Configuration
+
+```kotlin
+composeGuard {
+    // Backward-compatible build policy switch. Set false to report without failing.
+    failOnHigh = true
+
+    // Build fails when failOnHigh is true and an issue is at or above this severity.
+    failOnSeverity = "HIGH"
+
+    // Issues below this severity are omitted from the report.
+    minimumSeverity = "LOW"
+
+    sourceDirs.set(listOf("src/main/kotlin"))
+    excludes.add("generated")
+}
+```
+
+Severity values are `HIGH`, `MEDIUM`, and `LOW`.
+
+## Local Consumption
+
+For local development, an external project can consume ComposeGuard through the plugins DSL with an included build:
+
+```kotlin
+// settings.gradle.kts
+pluginManagement {
+    includeBuild("../composeguard")
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+}
+```
+
+```kotlin
+// build.gradle.kts
+plugins {
+    id("io.github.composeguard")
+}
+```
+
+The `sample/` project uses this path.
+
+## Local Publishing
+
+Publish plugin artifacts and the Gradle plugin marker to a local test repository:
+
+```bash
+./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
+```
+
+The repository is written to:
+
+```text
+build/local-plugin-repository
+```
+
+External projects can then use:
+
+```kotlin
+pluginManagement {
+    repositories {
+        maven("path/to/composeguard/build/local-plugin-repository")
+        gradlePluginPortal()
+    }
+}
+```
+
+```kotlin
+plugins {
+    id("io.github.composeguard") version "0.1.0-SNAPSHOT"
+}
+```
