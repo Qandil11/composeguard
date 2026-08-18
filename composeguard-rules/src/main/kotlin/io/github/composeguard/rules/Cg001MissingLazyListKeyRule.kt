@@ -75,17 +75,6 @@ class Cg001MissingLazyListKeyRule : ComposeGuardRule {
         return "$callee($firstArgument) { ... }"
     }
 
-    private fun String.lineNumberLookup(): (Int) -> Int {
-        val starts = mutableListOf(0)
-        forEachIndexed { index, char ->
-            if (char == '\n') starts += index + 1
-        }
-        return { offset ->
-            val insertionPoint = starts.binarySearch(offset)
-            if (insertionPoint >= 0) insertionPoint + 1 else -insertionPoint - 1
-        }
-    }
-
     private companion object {
         val lazyContainers = setOf("LazyColumn", "LazyRow")
         val lazyItemCalls = setOf("items", "itemsIndexed")

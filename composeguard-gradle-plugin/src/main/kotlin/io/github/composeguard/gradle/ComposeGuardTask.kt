@@ -35,8 +35,12 @@ abstract class ComposeGuardTask : DefaultTask() {
                     .map { file -> SourceFile(file.name, file.path, file.readText()) }
             }
 
-        val issues = ComposeGuardAnalyzer(ComposeGuardRules.phaseOne()).analyze(files)
-        val report = ComposeGuardReport.render(issues)
+        val issues = ComposeGuardAnalyzer(ComposeGuardRules.phaseTwo()).analyze(files)
+        val report = ComposeGuardReport.render(
+            issues = issues,
+            filesAnalyzed = files.size,
+            failOnHigh = failOnHigh.get()
+        )
         val output = reportFile.get().asFile
         output.parentFile.mkdirs()
         output.writeText(report)

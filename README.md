@@ -2,21 +2,29 @@
 
 Static performance checks for Jetpack Compose.
 
-## Phase 1 scope
+## Current scope
 
-This repository currently implements only **CG001: Missing Lazy List Keys**. That is deliberate: the first milestone proves the full chain before adding CG002-CG005.
+Phase 1 implemented only **CG001: Missing Lazy List Keys** to prove the full chain before adding more rules.
+
+Phase 2 adds:
+
+- **CG002: Collection transformation during composition** for direct composable-body property initializers such as `val sorted = products.sortedBy { ... }`.
+- **CG003: Mutable collection stored in Compose state** for `mutableStateOf(mutableListOf(...))`, `mutableStateOf(ArrayList(...))`, and similar mutable collection factories/types.
+- **CG004: State written during composition** for obvious body-level writes to state created by `remember { mutableStateOf(...) }`, while skipping writes inside lambdas/effects/event handlers.
+
+CG005 is intentionally not implemented yet.
 
 Verified chain:
 
 1. Compose/Kotlin source is read from Gradle source directories.
 2. The analyser parses Kotlin with Kotlin PSI from `kotlin-compiler-embeddable`.
-3. CG001 detects `items(collection) { ... }` or `itemsIndexed(collection) { ... }` inside `LazyColumn`/`LazyRow` when no `key` argument is present.
+3. Rules CG001-CG004 run as independent Kotlin PSI-based checks.
 4. The `composeGuard` Gradle task prints and writes a report.
-5. Tests cover rule detection, non-detection with `key`, report output, and failing the Gradle task for HIGH issues.
+5. Tests cover rule detection, negative cases, report output, and Gradle task build policy.
 
 ## Architecture decision
 
-Phase 1 uses **Kotlin PSI directly** rather than Android Lint, Detekt, or KtLint.
+The MVP uses **Kotlin PSI directly** rather than Android Lint, Detekt, or KtLint.
 
 Why:
 
