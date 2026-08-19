@@ -13,9 +13,9 @@ ComposeGuard does not depend on the Android runtime and does not use Android Lin
 
 ## Installation
 
-ComposeGuard is prepared for Gradle plugins DSL consumption, but it has not been published to the Gradle Plugin Portal yet. Until publication, use an included build or a local Maven repository.
+ComposeGuard `v0.1.0` is available on the Gradle Plugin Portal.
 
-After public plugin publication, installation will look like:
+Add the plugin to your project:
 
 ```kotlin
 plugins {
@@ -145,7 +145,7 @@ jobs:
       - run: ./gradlew -p sample composeGuard
 ```
 
-## Local Publishing
+## Local Development
 
 Publish all local artifacts, including the Gradle plugin marker:
 
@@ -186,7 +186,6 @@ ComposeGuard `v0.1.0` prefers false negatives over noisy false positives.
 - CG002 only reports direct composable-body property initializers. It intentionally skips transformations inside lambdas such as `remember { ... }`.
 - CG004 only reports obvious writes to local state created with `remember { mutableStateOf(...) }`. It skips writes inside lambdas, effects, and event handlers.
 - Exclusions are simple normalized path-substring matches, not full glob patterns.
-- CG005 is not implemented yet.
 
 ## Contributing
 
